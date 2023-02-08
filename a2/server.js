@@ -10,7 +10,6 @@ const fs = require("fs");
 const port = 3000;
 
 const app = express();
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/postings', (req, res) => {
@@ -35,10 +34,16 @@ app.post('/postmessage', (req, res) => {
 	// combine inputs and datetime
 	const final = (datetime + ' || ' + topic + " | " + data + '\n');
 
+	console.log('POST Request Received! Writing to file: ' + final);
+
 	// append input and timestamp to file (will create if doesn't exist)
 	fs.appendFile("posts.txt", final, function (err) {
 		if (err) return console.error(err);
 	});
+
+	var response = new Object();
+	response.answer = "wrote successfully!";
+	res.send(JSON.stringify(response));
 });
 
 // make the app listen
