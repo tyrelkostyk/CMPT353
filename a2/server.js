@@ -7,9 +7,15 @@ const express = require('express');
 const bodyParser = require('body-parser')
 const fs = require("fs");
 
+const port = 3000;
+
 const app = express();
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.get('/postings', (req, res) => {
+  res.sendFile(__dirname + '/postings.html')
+});
 
 app.post('/postmessage', (req, res) => {
 	// retrieve posted parameters
@@ -33,4 +39,9 @@ app.post('/postmessage', (req, res) => {
 	fs.appendFile("posts.txt", final, function (err) {
 		if (err) return console.error(err);
 	});
+});
+
+// make the app listen
+app.listen(port, function() {
+	console.log('Server listening on http://localhost:' + port);
 });
