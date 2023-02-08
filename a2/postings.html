@@ -23,12 +23,39 @@ function postMessage()
     {
         if (http.readyState == 4 && http.status == 200)
         {
+			// load the response message
             var response = JSON.parse(http.responseText);
             document.getElementById("answer").value = response.answer;
+
+			loadPosts();
         }
     };
 
     http.send(params);
+};
+
+function loadPosts()
+{
+	var rawFile = new XMLHttpRequest();
+	// rawFile.open("GET", "C:\\Users\\short\\Documents\\git-repos\\CMPT353\\a2\\posts.txt", true);
+	rawFile.open("GET", "http://localhost/posts.txt", true);
+
+	rawFile.onreadystatechange = function ()
+	{
+		if (rawFile.readyState == 4)
+		{
+			if (rawFile.status == 200)
+			{
+				document.getElementById('posts').value = rawFile.responseText;
+				alert("Success!");
+			}
+			else
+			{
+				alert("Reading posts file failed: " + rawFile.status);
+			}
+		}
+	};
+	rawFile.send(null);
 };
 
 </script>
@@ -41,7 +68,13 @@ function postMessage()
 <br>
 <br>
 
-<textarea id="answer"> waiting... </textarea>
+<textarea id="answer""> waiting... </textarea>
+<!-- <textarea id="answer"> waiting... </textarea> -->
+
+<br><br><br><br><br>
+
+<p> Previous Posts </p>
+<textarea id='posts'></textarea>
 
 </body>
 

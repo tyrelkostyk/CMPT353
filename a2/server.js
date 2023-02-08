@@ -8,6 +8,7 @@ const bodyParser = require('body-parser')
 const fs = require("fs");
 
 const port = 3000;
+const host = '0.0.0.0';
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -47,6 +48,4 @@ app.post('/postmessage', (req, res) => {
 });
 
 // make the app listen
-app.listen(port, function() {
-	console.log('Server listening on http://localhost:' + port);
-});
+app.listen(port, host);
