@@ -34,6 +34,13 @@ function postMessage()
     http.send(params);
 };
 
+/**
+ * NOTE FOR MARKERS -> this function doesn't work. It "succeeds" but returns a
+ * status of 0, indicating that responseText is empty. There are multiple reasons
+ * for this, but I believe the 2 most likely are:
+ * 		1. CORS rules prevent local file access
+ *		2. Incorrect file path to posts... I tried many, but none made it work
+ */
 function loadPosts()
 {
 	var rawFile = new XMLHttpRequest();
@@ -69,7 +76,6 @@ function loadPosts()
 <br>
 
 <textarea id="answer""> waiting... </textarea>
-<!-- <textarea id="answer"> waiting... </textarea> -->
 
 <br><br><br><br><br>
 
