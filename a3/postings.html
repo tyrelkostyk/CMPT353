@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+
+<html>
+
+<title>CMPT353 - A3</title>
+
+<body>
+
+<script type = "text/javascript">
+
+/**
+ * Tell the server to initialize the Database
+ */
+function init()
+{
+    var http = new XMLHttpRequest();
+    var url = '/init';
+    http.open('GET', url, true);
+    http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    http.onreadystatechange = function()
+    {
+        if (http.readyState == 4 && http.status == 200)
+        {
+			// load the response message
+            var response = JSON.parse(http.responseText);
+            document.getElementById("init-response").value = response.answer;
+        }
+    };
+    http.send();
+};
+
+/**
+ * Send a message (containing topic & data) to the server
+ */
+function postMessage()
+{
+	// TODO - change to a fetch() call
+    var http = new XMLHttpRequest();
+    var url = '/addPost';
+    var topic = 'topic=' + document.getElementById("topic").value;
+	var data = 'data=' + document.getElementById("data").value;
+	var params = topic + '&' + data;
+
+    http.open('POST', url, true);
+    http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+    http.onreadystatechange = function()
+    {
+        if (http.readyState == 4 && http.status == 200)
+        {
+			// load the response message
+            var response = JSON.parse(http.responseText);
+            document.getElementById("answer").value = response.answer;
+        }
+    };
+
+    http.send(params);
+};
+
+/**
+ * Retrieve posted messages (topic & data) from the server
+ */
+function loadMessages()
+{
+	// TODO - retrieve posts from server
+};
+
+</script>
+
+<p> Create DB </p>
+
+<button onclick= "init()"> init </button>
+<textarea id='init-response'></textarea>
+<br><br>
+
+<p> Post Away! </p>
+
+<input id="topic" type="text" name="topic" value=""><br>
+<input id="data" type="text" name="data" value=""><br> <br>
+<button onclick= "postMessage()"> send </button>
+<br>
+<br>
+
+<textarea id="answer"> waiting... </textarea>
+
+<br><br><br><br><br>
+
+<p> Previous Posts </p>
+<button onclick= "loadMessages()"> read </button>
+<br>
+<br>
+<textarea id='posts'></textarea>
+
+</body>
+
+</html>
