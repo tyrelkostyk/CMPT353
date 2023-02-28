@@ -4,8 +4,8 @@
 // February 8 2023
 
 const express = require('express');
-const bodyParser = require('body-parser')
-const mySql = require('mysql')
+const bodyParser = require('body-parser');
+const mySql = require('mysql');
 // TODO: how does this work?
 // const database = require('./sqlConnection');
 
@@ -19,9 +19,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // TODO: what does this do? Is it necessary?
 // module.exports = connection;
 
-var success = false;
-var connection = mySql.createConnection({
-	host: "127.0.0.1",
+
+let connection = mySql.createConnection({
 	user: "tyrel",
 	password: ""
 });
