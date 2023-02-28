@@ -9,8 +9,8 @@ const mySql = require('mysql');
 // TODO: how does this work?
 // const database = require('./sqlConnection');
 
-const port = 3306;
-const host = '0.0.0.0';
+const port = 3000;
+const host = 'localhost';
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -21,15 +21,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 let connection = mySql.createConnection({
-	user: "tyrel",
-	password: ""
+	host: 'localhost',
+	user: "root",
+	password: "password"
 });
 connection.connect((err) => {
-	if (err) {
-		console.log("Failed to connect to MySql DB ", err);
-	} else {
-		console.log("Connected to MySql DB ", err);
-	}
+	if (err) throw err;
+	console.log("Connected to MySql DB ");
 });
 
 
@@ -40,42 +38,28 @@ app.get('/', (req, res) => {
 
 // A3 Part A -> initialize a DB
 app.get('/init', (req, res) => {
-	// var success = false;
-	// console.log("1");
-	// var connection = mySql.createConnection({
-	// 	host: "127.0.0.1",
-	// 	user: "tyrel",
-	// 	password: ""
-	// });
-	// console.log("2");
-	// connection.connect((err) => {
-	// 	console.log("3");
-	// 	if (err) {
-	// 		console.log("3a");
-	// 		console.log("Failed to connect to MySql DB ", err);
-	// 		success = false;
-	// 	} else {
-	// 		console.log("3b");
-	// 		console.log("Connected to MySql DB ", err);
-	// 		success = true;
-	// 	}
-	// });
-	// console.log("4");
+	var success = true;
 
-	// var databaseName = "postdb";
-	// var createQuery = `CREATE DATABASE ${databaseName}`;
-	// database.query(createQuery, (err) => {
-	// 	if (err) { throw err; }
-	// 	console.log("MySql DB (" + databaseName + ") created successfully");
-	//
-	// 	var useQuery = `USE ${databaseName}`;
-	// 	database.query(useQuery, (err) => {
-	// 		if (err) { throw err; }
-	// 		console.log("Using " + databaseName + " database");
-	// 	});
-	// });
+	console.log("1");
+
+	var databaseName = "postdb";
+	var createQuery = `CREATE DATABASE IF NOT EXISTS ${databaseName}`;
+	connection.query(createQuery, (err) => {
+		if (err) { throw err; }
+		console.log("MySql DB (" + databaseName + ") created successfully");
+
+		console.log("2");
+
+		var useQuery = `USE ${databaseName}`;
+		connection.query(useQuery, (err) => {
+			if (err) { throw err; }
+			console.log("Using " + databaseName + " database");
+			console.log("3");
+		});
+	});
 	// TODO: create table named posts
 	// TODO: send response
+	console.log("4");
 
 	var response = new Object();
 	if (success) response.answer = "Success!";
@@ -120,4 +104,6 @@ app.get('/getPosts', (req, res) => {
 });
 
 // make the app listen
-app.listen(port, host);
+app.listen(port, host, () => {
+	console.log(`Server started on http://${host}:${port}`);
+});
