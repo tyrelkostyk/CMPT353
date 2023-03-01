@@ -6,8 +6,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mySql = require('mysql');
-// TODO: how does this work?
-// const database = require('./sqlConnection');
 
 const port = 3000;
 const host = 'localhost';
@@ -15,15 +13,14 @@ const host = 'localhost';
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
-// TODO: what does this do? Is it necessary?
-// module.exports = connection;
-
+var databaseName = "postdb";
+var tableName = "posts";
 
 let connection = mySql.createConnection({
 	host: 'localhost',
 	user: "root",
-	password: "password"
+	password: "password",
+	database: "postdb"
 });
 connection.connect((err) => {
 	if (err) throw err;
@@ -38,32 +35,31 @@ app.get('/', (req, res) => {
 
 // A3 Part A -> initialize a DB
 app.get('/init', (req, res) => {
-	var success = true;
-
-	console.log("1");
-
-	var databaseName = "postdb";
 	var createQuery = `CREATE DATABASE IF NOT EXISTS ${databaseName}`;
 	connection.query(createQuery, (err) => {
 		if (err) { throw err; }
 		console.log("MySql DB (" + databaseName + ") created successfully");
 
-		console.log("2");
-
 		var useQuery = `USE ${databaseName}`;
 		connection.query(useQuery, (err) => {
 			if (err) { throw err; }
 			console.log("Using " + databaseName + " database");
-			console.log("3");
 		});
 	});
-	// TODO: create table named posts
-	// TODO: send response
-	console.log("4");
+	// create table named posts
+	var createTableQuery = `CREATE TABLE IF NOT EXISTS ${tableName} (
+		id		INT UNSIGNED NOT NULL auto_increment,
+		topic	VARCHAR(100) NOT NULL,
+		data	VARCHAR(100) NOT NULL,
+		PRIMARY KEY (id)
+	)`;
+	connection.query(createTableQuery, (err) => {
+		if (err) { throw err; }
+		console.log("Created " + tableName + " database");
+	});
 
 	var response = new Object();
-	if (success) response.answer = "Success!";
-	else 		 response.answer = "Failed.";
+	response.answer = "Success!";
 	res.send(JSON.stringify(response));
 });
 
@@ -74,23 +70,15 @@ app.post('/addPost', (req, res) => {
     const topic = req.body.topic;
     const data = req.body.data;
 
-	// TODO: do I need this?
-	// retrieve current date & time
-	const date 		= new Date();
-	const day 		= date.getDate();
-	const month 	= date.getMonth();
-	const year 		= date.getFullYear();
-	const hour 		= date.getHours();
-	const minute 	= date.getMinutes();
-	const second 	= date.getSeconds();
-	const datetime = (year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second);
+	console.log('POST Request Received! Topic: ' + topic + ' Data: ' + data);
 
-	// combine inputs and datetime
-	const final = (datetime + ' || ' + topic + " | " + data + '\n');
-
-	console.log('POST Request Received! Writing to file: ' + final);
-
-	// TODO: send to DB
+	// insert into table
+	var insertQuery = `INSERT INTO ${tableName} (topic, data)
+		VALUES ('${topic}', '${data}') `;
+	connection.query(insertQuery, (err, result) => {
+		if (err) throw err;
+		console.log("Inserted " + topic + ":" + data);
+	})
 
 	var response = new Object();
 	response.answer = "wrote successfully!";
