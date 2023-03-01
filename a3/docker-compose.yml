@@ -1,24 +1,32 @@
-version: '3'
-
+version: '3.8'
 services:
-  db:
-    image: mysql:latest
-    environment:
-      MYSQL_USER: root
-      MYSQL_PASSWORD: password
-      MYSQL_DATABASE: postdb
-    ports:
-      - "3306:3306"
-    command: --default-authentication-plugin=mysql_native_password
+ app:
+  image: node:latest
+  environment:
+   DB_HOST: mysql1
+   DB_PORT: 3306
+   DB_USER: root
+   DB_PASSWORD: password
+  ports:
+   - "3000:3000"
+  command: ["bin/bash"]
+  depends_on:
+   - mysql1
+  stdin_open: true
+  tty: true
 
-  app:
-    build: .
-    ports:
-      - "3000:3000"
-    depends_on:
-      - db
-    environment:
-      DB_HOST: db
-      DB_USER: root
-      DB_PASSWORD: password
-      DB_DATABASE: postdb
+ mysql1:
+  image: mysql:5.7
+  restart: always
+  container_name: db1
+  environment:
+   - MYSQL_ROOT_PASSWORD=password
+  ports:
+   - '3306:3306'
+  volumes:
+    - post_data:/var/lib/mysql
+  stdin_open: true
+  tty: true
+
+volumes:
+    post_data:

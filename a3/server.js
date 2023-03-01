@@ -1,14 +1,15 @@
 // Tyrel Kostyk
 // tck290, 11216033
 // CMPT353 - Assignment 3, Parts A B and C
-// February 8 2023
+// March 1 2023
 
 const express = require('express');
 const bodyParser = require('body-parser');
 const mySql = require('mysql');
 
 const port = 3000;
-const host = 'localhost';
+const host = '0.0.0.0';
+// const host = 'localhost';
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -18,7 +19,9 @@ var databaseName = "postdb";
 var tableName = "posts";
 
 let connection = mySql.createConnection({
-	host: 'localhost',
+	// host: "0.0.0.0",
+	// host: "localhost",
+	host: "mysql1",
 	user: "root",
 	password: "password",
 	database: "postdb"
