@@ -67,7 +67,6 @@ app.get('/init', (req, res) => {
 
 // A3 Part B -> Add a new posted message to DB
 app.post('/addPost', (req, res) => {
-	console.log(req.body);
     const topic = req.body.topic;
     const data = req.body.data;
 
@@ -89,7 +88,16 @@ app.post('/addPost', (req, res) => {
 
 // A3 Part C -> GET method that returns all the posted DB entries
 app.get('/getPosts', (req, res) => {
-	// TODO:
+	var response = new Object();
+
+	// select from table
+	var selectQuery = `SELECT * FROM ${tableName}`;
+	connection.query(selectQuery, (err, result) => {
+		if (err) throw err;
+		response = JSON.parse(JSON.stringify(result));
+		console.log("Retrieved: ", response);
+		res.json(response);
+	})
 });
 
 // make the app listen

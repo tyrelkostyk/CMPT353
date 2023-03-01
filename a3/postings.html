@@ -9,7 +9,7 @@
 <script type = "text/javascript">
 
 /**
- * Tell the server to initialize the Database
+ * Tell the server to initialize the Database & Table
  */
 function init()
 {
@@ -49,7 +49,43 @@ function postMessage()
  */
 function loadMessages()
 {
-	// TODO - retrieve posts from server
+	var url = '/getPosts';
+	fetch(url, {
+		method: 'GET',
+	})
+		.then(response => response.json())
+		.then(data => {
+			// create new table
+			const table = document.createElement("table");
+
+			// create header
+			var tableRow = table.insertRow(-1);
+			var indexHeader = document.createElement("th");
+			indexHeader.innerHTML = "Index";
+			tableRow.appendChild(indexHeader)
+			var topicHeader = document.createElement("th");
+			topicHeader.innerHTML = "Topic";
+			tableRow.appendChild(topicHeader)
+			var dataHeader = document.createElement("th");
+			dataHeader.innerHTML = "Data";
+			tableRow.appendChild(dataHeader)
+
+			var headers = ["id", "topic", "data"];
+
+			// add JSON post data to table
+			for (var row = 0; row < data.length; row++) {
+				tableRow = table.insertRow(-1);
+				for (var column = 0; column < headers.length; column++) {
+					var tableCell = tableRow.insertCell(-1);
+					tableCell.innerHTML = data[row][headers[column]];
+					console.log(data[row][headers[column]]);
+				}
+			}
+
+			// now add the new table to the container
+			document.getElementById("posts").innerHTML = "";
+			document.getElementById("posts").appendChild(table);
+	})
 };
 
 </script>
@@ -72,11 +108,12 @@ function loadMessages()
 
 <br><br><br><br><br>
 
-<p> Previous Posts </p>
+<p> Posts </p>
 <button onclick= "loadMessages()"> read </button>
 <br>
 <br>
-<textarea id='posts'></textarea>
+
+<p id='posts'></p>
 
 </body>
 
