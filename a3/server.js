@@ -12,6 +12,7 @@ const host = 'localhost';
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 var databaseName = "postdb";
 var tableName = "posts";
@@ -66,7 +67,7 @@ app.get('/init', (req, res) => {
 
 // A3 Part B -> Add a new posted message to DB
 app.post('/addPost', (req, res) => {
-	// retrieve posted parameters
+	console.log(req.body);
     const topic = req.body.topic;
     const data = req.body.data;
 
@@ -82,7 +83,7 @@ app.post('/addPost', (req, res) => {
 
 	var response = new Object();
 	response.answer = "wrote successfully!";
-	res.send(JSON.stringify(response));
+	res.send(response);
 });
 
 
