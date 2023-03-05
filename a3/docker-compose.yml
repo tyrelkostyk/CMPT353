@@ -1,7 +1,7 @@
 version: '3.8'
 services:
  app:
-  image: node:latest
+  build: .
   environment:
    DB_HOST: mysql1
    DB_PORT: 3306
@@ -9,18 +9,19 @@ services:
    DB_PASSWORD: password
   ports:
    - "3000:3000"
-  command: ["bin/bash"]
   depends_on:
    - mysql1
   stdin_open: true
   tty: true
 
  mysql1:
-  image: mysql:5.7
+  image: mysql:8.0
   restart: always
   container_name: db1
   environment:
    - MYSQL_ROOT_PASSWORD=password
+  command:
+      --default-authentication-plugin=mysql_native_password
   ports:
    - '3306:3306'
   volumes:

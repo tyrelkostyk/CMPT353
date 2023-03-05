@@ -23,22 +23,23 @@ let connection = mySql.createConnection({
 	// host: "localhost",
 	host: "mysql1",
 	user: "root",
+	port: 3306,
 	password: "password",
-	database: "postdb"
+	// database: "postdb"
 });
-connection.connect((err) => {
-	if (err) throw err;
-	console.log("Connected to MySql DB ");
-});
-
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/postings.html')
 });
 
-
 // A3 Part A -> initialize a DB
 app.get('/init', (req, res) => {
+
+	connection.connect((err) => {
+		if (err) throw err;
+		console.log("Connected to MySql DB ");
+	});
+
 	var createQuery = `CREATE DATABASE IF NOT EXISTS ${databaseName}`;
 	connection.query(createQuery, (err) => {
 		if (err) { throw err; }
