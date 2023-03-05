@@ -8,8 +8,8 @@ const bodyParser = require('body-parser');
 const mySql = require('mysql');
 
 const port = 3000;
-const host = '0.0.0.0';
-// const host = 'localhost';
+// const host = '0.0.0.0';
+const host = 'localhost';
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -21,9 +21,9 @@ var tableName = "posts";
 let connection = mySql.createConnection({
 	// host: "0.0.0.0",
 	// host: "localhost",
-	host: "mysql1",
+	// host: "mysql1",
 	user: "root",
-	port: 3306,
+	// port: 3306,
 	password: "password",
 	// database: "postdb"
 });
@@ -50,26 +50,26 @@ app.get('/init', (req, res) => {
 		connection.query(useQuery, (err) => {
 			if (err) { throw err; }
 			console.log("Using " + databaseName + " database");
+
+			// drop the table (if it exists)
+			var dropQuery = `DROP TABLE IF EXISTS ${tableName}`;
+			connection.query(dropQuery, (err) => {
+				if (err) { throw err; }
+				console.log("Dropped " + tableName + " table");
+			});
+
+			// create table named posts
+			var createTableQuery = `CREATE TABLE IF NOT EXISTS ${tableName} (
+				id		INT UNSIGNED NOT NULL auto_increment,
+				topic	VARCHAR(100) NOT NULL,
+				data	VARCHAR(100) NOT NULL,
+				PRIMARY KEY (id)
+			)`;
+			connection.query(createTableQuery, (err) => {
+				if (err) { throw err; }
+				console.log("Created " + tableName + " table");
+			});
 		});
-	});
-
-	// drop the table (if it exists)
-	var dropQuery = `DROP TABLE IF EXISTS ${tableName}`;
-	connection.query(dropQuery, (err) => {
-		if (err) { throw err; }
-		console.log("Dropped " + tableName + " table");
-	});
-
-	// create table named posts
-	var createTableQuery = `CREATE TABLE IF NOT EXISTS ${tableName} (
-		id		INT UNSIGNED NOT NULL auto_increment,
-		topic	VARCHAR(100) NOT NULL,
-		data	VARCHAR(100) NOT NULL,
-		PRIMARY KEY (id)
-	)`;
-	connection.query(createTableQuery, (err) => {
-		if (err) { throw err; }
-		console.log("Created " + tableName + " table");
 	});
 
 	var response = new Object();

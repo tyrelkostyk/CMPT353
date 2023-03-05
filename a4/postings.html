@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+
+<html>
+
+<title>CMPT353 - A4</title>
+
+<body>
+
+<script type = "text/javascript">
+
+/**
+ * Tell the server to initialize the Database & Table
+ */
+function init()
+{
+    var url = '/init';
+	fetch(url, {
+		method: 'GET',
+	})
+		.then(response => response.json())
+		.then(data => {
+			console.log(data);
+            document.getElementById("init-response").value = data.answer;
+	})
+};
+
+/**
+ * Send a message (containing topic & data) to the server
+ */
+function postMessage()
+{
+    var url = '/addPost';
+	var topic = document.getElementById("topic").value;
+	var data = document.getElementById("data").value;
+	fetch(url, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ 'topic': topic, 'data': data })
+	})
+		.then(response => response.json())
+		.then(data => {
+			console.log(data);
+            document.getElementById("post-response").value = data.answer;
+	})
+};
+
+/**
+ * Retrieve posted messages (topic & data) from the server
+ */
+function loadMessages()
+{
+	var url = '/getPosts';
+	fetch(url, {
+		method: 'GET',
+	})
+		.then(response => response.json())
+		.then(data => {
+			// create new table
+			const table = document.createElement("table");
+
+			// create header
+			var tableRow = table.insertRow(-1);
+			var indexHeader = document.createElement("th");
+			indexHeader.innerHTML = "Index";
+			tableRow.appendChild(indexHeader)
+			var topicHeader = document.createElement("th");
+			topicHeader.innerHTML = "Topic";
+			tableRow.appendChild(topicHeader)
+			var dataHeader = document.createElement("th");
+			dataHeader.innerHTML = "Data";
+			tableRow.appendChild(dataHeader)
+
+			var headers = ["id", "topic", "data"];
+
+			// add JSON post data to table
+			for (var row = 0; row < data.length; row++) {
+				tableRow = table.insertRow(-1);
+				for (var column = 0; column < headers.length; column++) {
+					var tableCell = tableRow.insertCell(-1);
+					tableCell.innerHTML = data[row][headers[column]];
+					console.log(data[row][headers[column]]);
+				}
+			}
+
+			// now add the new table to the container
+			document.getElementById("posts").innerHTML = "";
+			document.getElementById("posts").appendChild(table);
+	})
+};
+
+</script>
+
+<p> Create DB </p>
+
+<button onclick= "init()"> init </button>
+<textarea id='init-response'></textarea>
+<br><br>
+
+<p> Post Away! </p>
+
+<input id="topic" type="text" name="topic" value=""><br>
+<input id="data" type="text" name="data" value=""><br> <br>
+<button onclick= "postMessage()"> send </button>
+<br>
+<br>
+
+<textarea id="post-response"> waiting... </textarea>
+
+<br><br><br><br><br>
+
+<p> Posts </p>
+<button onclick= "loadMessages()"> read </button>
+<br>
+<br>
+
+<p id='posts'></p>
+
+</body>
+
+</html>
