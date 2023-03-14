@@ -4,11 +4,11 @@ import React, { Component } from 'react';
 import { useState } from 'react';
 
 
-function ShowPosts(get) {
+function ShowPosts({get}) {
 	return (
 		<>
         {get.map(post => (
-            <div className="container">
+            <div className="container" key={post.id}>
                 <h3> {post.id} </h3>
                 <h3> {post.text} </h3>
                 <h3> {post.time} </h3>

@@ -43,6 +43,7 @@ function App() {
 {/*
 	        <Link to="/addPosts">  <button> Add Posts </button>   </Link>
 */}
+			<Link to="/">  <button> Home </button> </Link>
 			</Router>
 			</div>
 		</header>
