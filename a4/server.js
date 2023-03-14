@@ -107,11 +107,16 @@ app.get('/api/getPosts', (req, res) => {
 	// select from table
 	var selectQuery = `SELECT * FROM ${tableName}`;
 	connection.query(selectQuery, (err, result) => {
-		if (err) throw err;
-		response = JSON.parse(JSON.stringify(result));
-		console.log("Retrieved: ", response);
-		res.json(response);
+		if (err) {
+			console.log("getPosts failed: ", err);
+		} else {
+			response = JSON.parse(JSON.stringify(result));
+			console.log("Retrieved: ", response);
+			res.json(response);
+		}
 	})
+
+	res.send(response);
 });
 
 

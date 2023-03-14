@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { useState } from 'react';
 
 
-function Landing() {
+function Landing(props) {
 
 	const [initResponse, setInitResponse] = useState('');
 
@@ -15,14 +15,19 @@ function Landing() {
 			.then(data => {
 				console.log(data);
 				setInitResponse(data.answer);
+				if (data.answer == "Success!") {
+					props.update(true);
+				} else {
+					props.update(false);
+				}
 		})
     }
 
 	return (
 		<div>
 			<h3>Welcome to Tyrel's React App! Pls let me graduate :')</h3>
-			<h1>This is my last course</h1>
-			<p>pls</p>
+			<h4>This is my last course</h4>
+			<h5>pls</h5>
 			<br/><br/><br/>
 			<button onClick={handleInitClick}>Init Database</button>
 			<p>{initResponse}</p>
