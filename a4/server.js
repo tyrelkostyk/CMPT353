@@ -7,6 +7,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mySql = require('mysql');
 const path = require('path').join(__dirname, 'frontend', 'build');
+const cors = require('cors');
 
 const port = 3000;
 // const host = '0.0.0.0';
@@ -16,6 +17,7 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path));
+app.use(cors());
 
 var databaseName = "postdb";
 var tableName = "posts";
