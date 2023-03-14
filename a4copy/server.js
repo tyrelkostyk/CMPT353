@@ -30,6 +30,12 @@ let connection = mySql.createConnection({
 	// database: "postdb"
 });
 
+// Handles any requests that don't match the ones above
+app.get('*', (req,res) =>{
+  res.sendFile('index.html', {path});
+});
+
+
 // app.get('/', (req, res) => {
 //   res.sendFile(__dirname + '/postings.html')
 // });
@@ -114,11 +120,6 @@ let connection = mySql.createConnection({
 // 		res.json(response);
 // 	})
 // });
-
-// Handles any requests that don't match the ones above
-app.get('*', (req,res) =>{
-  res.sendFile('index.html', {path});
-});
 
 // make the app listen
 app.listen(port, host, () => {
