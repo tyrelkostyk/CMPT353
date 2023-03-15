@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+ app:
+  build: .
+  environment:
+   DB_HOST: mysql1
+   DB_PORT: 3306
+   DB_USER: root
+   DB_PASSWORD: password
+  ports:
+   - "3000:3000"
+  depends_on:
+   - mysql1
+
+ mysql1:
+  image: mysql:8.0
+  restart: always
+  container_name: db1
+  environment:
+   - MYSQL_ROOT_PASSWORD=password
+  command:
+      --default-authentication-plugin=mysql_native_password
+  ports:
+   - '3306:3306'
+  volumes:
+    - post_data:/var/lib/mysql
+
+volumes:
+    post_data:

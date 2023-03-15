@@ -10,8 +10,8 @@ const path = require('path').join(__dirname, 'frontend', 'build');
 const cors = require('cors');
 
 const port = 3000;
-// const host = '0.0.0.0';
-const host = 'localhost';
+const host = '0.0.0.0';
+// const host = 'localhost';
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -23,9 +23,8 @@ const databaseName = "postdb";
 const tableName = "posts";
 
 const connection = mySql.createConnection({
-	// host: "0.0.0.0",
-	// host: "localhost",
 	// host: "mysql1",
+	host: process.env.DB_HOST,
 	user: "root",
 	// port: 3306,
 	password: "password",
