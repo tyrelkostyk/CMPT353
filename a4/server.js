@@ -19,10 +19,10 @@ app.use(bodyParser.json());
 app.use(express.static(path));
 app.use(cors());
 
-var databaseName = "postdb";
-var tableName = "posts";
+const databaseName = "postdb";
+const tableName = "posts";
 
-let connection = mySql.createConnection({
+const connection = mySql.createConnection({
 	// host: "0.0.0.0",
 	// host: "localhost",
 	// host: "mysql1",
@@ -34,48 +34,70 @@ let connection = mySql.createConnection({
 
 
 // Part A -> initialize a DB and table
+let serverInitialized = false;
 app.get('/api/init', (req, res) => {
 
+	// prevent multiple connection attempts
+	if (serverInitialized) {
+		console.log("Server DB already initialized.");
+		res.json({ answer: "Success!" });
+		return;
+	}
+
 	connection.connect((err) => {
-		if (err) throw err;
+		if (err) {
+			console.error("Failed to connect to database: ", err);
+			res.status(500).send("Error connecting to database.");
+		}
 		console.log("Connected to MySql DB ");
 	});
 
 	// create the database
-	var createQuery = `CREATE DATABASE IF NOT EXISTS ${databaseName}`;
+	const createQuery = `CREATE DATABASE IF NOT EXISTS ${databaseName}`;
 	connection.query(createQuery, (err) => {
-		if (err) { throw err; }
+		if (err) {
+			console.error("Failed to create database: ", err);
+			res.status(500).send("Error creating database.");
+		}
 		console.log("MySql DB (" + databaseName + ") created successfully");
 
-		var useQuery = `USE ${databaseName}`;
+		const useQuery = `USE ${databaseName}`;
 		connection.query(useQuery, (err) => {
-			if (err) { throw err; }
+			if (err) {
+				console.error("Failed to use database: ", err);
+				res.status(500).send("Error using database.");
+			}
 			console.log("Using " + databaseName + " database");
 
 			// drop the table (if it exists)
-			var dropQuery = `DROP TABLE IF EXISTS ${tableName}`;
+			const dropQuery = `DROP TABLE IF EXISTS ${tableName}`;
 			connection.query(dropQuery, (err) => {
-				if (err) { throw err; }
+				if (err) {
+					console.error("Failed to drop table: ", err);
+		            res.status(500).send("Error dropping table.");
+				}
 				console.log("Dropped " + tableName + " table");
 			});
 
 			// create table named posts
-			var createTableQuery = `CREATE TABLE IF NOT EXISTS ${tableName} (
+			const createTableQuery = `CREATE TABLE IF NOT EXISTS ${tableName} (
 				id		INT UNSIGNED NOT NULL auto_increment,
 				topic	VARCHAR(100) NOT NULL,
 				data	VARCHAR(100) NOT NULL,
 				PRIMARY KEY (id)
 			)`;
 			connection.query(createTableQuery, (err) => {
-				if (err) { throw err; }
-				console.log("Created " + tableName + " table");
+				if (err) {
+					console.error("Failed to create table: ", err);
+		            res.status(500).send("Error creating table.");
+				} else {
+					console.log("Created " + tableName + " table");
+					serverInitialized = true;
+					res.json({ answer: "Success!" });
+				}
 			});
 		});
 	});
-
-	var response = new Object();
-	response.answer = "Success!";
-	res.send(JSON.stringify(response));
 });
 
 
@@ -87,31 +109,30 @@ app.post('/api/addPost', (req, res) => {
 	console.log('POST Request Received! Topic: ' + topic + ' Data: ' + data);
 
 	// insert into table
-	var insertQuery = `INSERT INTO ${tableName} (topic, data)
-		VALUES ('${topic}', '${data}') `;
+	const insertQuery = `INSERT INTO ${tableName} (topic, data)
+						VALUES ('${topic}', '${data}') `;
 	connection.query(insertQuery, (err, result) => {
-		if (err) throw err;
-		console.log("Inserted " + topic + ":" + data);
+		if (err) {
+            console.error("Failed to insert post: ", err);
+            res.status(500).send("Error inserting post into the database.");
+        } else {
+            console.log("Inserted " + topic + ":" + data);
+            res.json({ answer: "wrote successfully!" });
+        }
 	})
-
-	var response = new Object();
-	response.answer = "wrote successfully!";
-	res.send(response);
 });
 
 
 // Part B -> GET method that returns all the posted DB entries
 app.get('/api/getPosts', (req, res) => {
-	var response = new Object();
-
 	// select from table
-	var selectQuery = `SELECT * FROM ${tableName}`;
+	const selectQuery = `SELECT * FROM ${tableName}`;
 	connection.query(selectQuery, (err, result) => {
 		if (err) {
 			console.log("getPosts failed: ", err);
 			res.status(500).send("Error querying the database.");
 		} else {
-			response = JSON.parse(JSON.stringify(result));
+			const response = JSON.parse(JSON.stringify(result));
 			console.log("Retrieved: ", response);
 			res.json(response);
 		}
