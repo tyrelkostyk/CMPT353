@@ -6,9 +6,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
 import Landing from './Landing';
 import ShowPosts from './ShowPosts';
-{/*
 import AddPosts from './AddPosts';
-*/}
 
 function App() {
 
@@ -30,14 +28,10 @@ function App() {
 			<Routes>
 				<Route exact path='/' element={<Landing update = {updateStatus} />} />
 				<Route path="/showPosts" element={<ShowPosts />} />
-{/*
-	            <Route path="/addPosts" element={ <AddPosts set = {setList} /> } />
-*/}
+	            <Route path="/addPosts" element={ <AddPosts /> } />
 			</Routes>
 			<Link to="/showPosts">  <button> Show Posts (Server {dbStatus}) </button> </Link>
-{/*
 	        <Link to="/addPosts">  <button> Add Posts </button>   </Link>
-*/}
 			<Link to="/">  <button> Home </button> </Link>
 			</Router>
 			</div>
