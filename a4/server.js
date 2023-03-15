@@ -109,14 +109,13 @@ app.get('/api/getPosts', (req, res) => {
 	connection.query(selectQuery, (err, result) => {
 		if (err) {
 			console.log("getPosts failed: ", err);
+			res.status(500).send("Error querying the database.");
 		} else {
 			response = JSON.parse(JSON.stringify(result));
 			console.log("Retrieved: ", response);
 			res.json(response);
 		}
-	})
-
-	res.send(response);
+	});
 });
 
 

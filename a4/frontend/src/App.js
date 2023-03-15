@@ -22,11 +22,6 @@ function App() {
 		}
 	}
 
-	const [getList, setList] = useState([]);
-	{/*
-    if(getList.length <1) {fetch('api/getPosts').then(response => response.json()).then(response => setList(response))};
-	*/}
-
 	return (
 	<div className="App">
 		<header className="App-header">
@@ -34,7 +29,7 @@ function App() {
 			<Router>
 			<Routes>
 				<Route exact path='/' element={<Landing update = {updateStatus} />} />
-				<Route path="/showPosts" element={<ShowPosts get = {getList}/>} />
+				<Route path="/showPosts" element={<ShowPosts />} />
 {/*
 	            <Route path="/addPosts" element={ <AddPosts set = {setList} /> } />
 */}
