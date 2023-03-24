@@ -1,0 +1,24 @@
+version: '3.8'
+services:
+ app:
+  build: .
+  environment:
+   COUCHDB_URL: "http://admin:password@my-couchdb:5984"
+  ports:
+   - "3000:3000"
+  depends_on:
+   - cdb
+
+ cdb:
+  image: "couchdb:latest"
+  container_name: "cdb1"
+  environment:
+   COUCHDB_USER: "admin"
+   COUCHDB_PASSWORD: "password"
+  ports:
+   - "5984:5984"
+  volumes:
+   - couchdb_data:/var/lib/couchdb
+
+volumes:
+    couchdb_data:
