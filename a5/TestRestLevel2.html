@@ -2,40 +2,25 @@
 
 <html>
 
-<title>CMPT353 - A4</title>
+<title>CMPT353 - A5</title>
 
 <body>
 
 <script type = "text/javascript">
 
 /**
- * Tell the server to initialize the Database & Table
- */
-function init()
-{
-    var url = '/init';
-	fetch(url, {
-		method: 'GET',
-	})
-		.then(response => response.json())
-		.then(data => {
-			console.log(data);
-            document.getElementById("init-response").value = data.answer;
-	})
-};
-
-/**
- * Send a message (containing topic & data) to the server
+ * Send a post (containing ID, Topic & Data) to the server.
  */
 function postMessage()
 {
     var url = '/addPost';
+	var id = document.getElementById("postId").value;
 	var topic = document.getElementById("topic").value;
 	var data = document.getElementById("data").value;
 	fetch(url, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ 'topic': topic, 'data': data })
+		body: JSON.stringify({ 'postId': id, 'postTopic': topic, 'postData': data })
 	})
 		.then(response => response.json())
 		.then(data => {
@@ -90,14 +75,9 @@ function loadMessages()
 
 </script>
 
-<p> Create DB </p>
-
-<button onclick= "init()"> init </button>
-<textarea id='init-response'></textarea>
-<br><br>
-
 <p> Post Away! </p>
 
+<input id="postId" type="text" name="id" value=""><br>
 <input id="topic" type="text" name="topic" value=""><br>
 <input id="data" type="text" name="data" value=""><br> <br>
 <button onclick= "postMessage()"> send </button>

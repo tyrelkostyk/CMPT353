@@ -3,7 +3,7 @@ services:
  app:
   build: .
   environment:
-   COUCHDB_URL: "http://admin:password@my-couchdb:5984"
+   COUCHDB_URL: "http://admin:password@cdb1:5984"
   ports:
    - "3000:3000"
   depends_on:

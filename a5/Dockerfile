@@ -6,6 +6,6 @@ WORKDIR /a5
 
 COPY . .
 
-CMD ["node", "server.js"]
+CMD ["node", "serverA.js"]
 
 EXPOSE 3000
