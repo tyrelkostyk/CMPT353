@@ -9,9 +9,9 @@
 <script type = "text/javascript">
 
 /**
- * Send a post (containing ID, Topic & Data) to the server.
+ * Send a new post (containing ID, Topic & Data) to the server.
  */
-function postMessage()
+function sendPost()
 {
     var url = '/addPost';
 	var id = document.getElementById("postId").value;
@@ -30,9 +30,30 @@ function postMessage()
 };
 
 /**
- * Retrieve posted messages (topic & data) from the server
+ * Send a comment (containing ID, Post ID, and Text) to the server.
  */
-function loadMessages()
+function sendComment()
+{
+	var postId = document.getElementById("commentPostId").value;
+    var url = `/addComment/${postId}`;
+	var id = document.getElementById("commentId").value;
+	var text = document.getElementById("commentText").value;
+	fetch(url, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ 'commentId': id, 'postId': postId, 'commentText': text })
+	})
+		.then(response => response.json())
+		.then(data => {
+			console.log(data);
+            document.getElementById("comment-response").value = data.answer;
+	})
+};
+
+/**
+ * Retrieve Posts (ID, Topic & Data) from the server
+ */
+function readPosts()
 {
 	var url = '/getPosts';
 	fetch(url, {
@@ -73,27 +94,95 @@ function loadMessages()
 	})
 };
 
+/**
+ * Retrieve Comments for a Post (ID & Text) from the server
+ */
+function readComments()
+{
+	var postId = document.getElementById("getCommentsPostId").value;
+	var url = `/getComments/${postId}`;
+	fetch(url, {
+		method: 'GET',
+	})
+		.then(response => response.json())
+		.then(data => {
+			// create new table
+			const post = document.createElement("div");
+			post.textContent = "Post ID: " + postId;
+
+			// create new table
+			const table = document.createElement("table");
+
+			// create header
+			var tableRow = table.insertRow(-1);
+			var idHeader = document.createElement("th");
+			idHeader.innerHTML = "ID";
+			tableRow.appendChild(idHeader)
+			var textHeader = document.createElement("th");
+			textHeader.innerHTML = "Text";
+			tableRow.appendChild(textHeader)
+
+			var headers = ["commentId", "commentText"];
+
+			// add JSON comment data to table
+			for (var row = 0; row < data.length; row++) {
+				tableRow = table.insertRow(-1);
+				for (var column = 0; column < headers.length; column++) {
+					var tableCell = tableRow.insertCell(-1);
+					tableCell.innerHTML = data[row][headers[column]];
+					console.log(data[row][headers[column]]);
+				}
+			}
+
+			// now add the new table to the container
+			document.getElementById("comments").innerHTML = "";
+			document.getElementById("comments").appendChild(post);
+			document.getElementById("comments").appendChild(table);
+	})
+};
+
 </script>
 
 <p> Post Away! </p>
 
-<input id="postId" type="text" name="id" value=""><br>
-<input id="topic" type="text" name="topic" value=""><br>
-<input id="data" type="text" name="data" value=""><br> <br>
-<button onclick= "postMessage()"> send </button>
+<input id="postId" type="text" name="postId" value="ID"><br>
+<input id="topic" type="text" name="topic" value="Topic..."><br>
+<input id="data" type="text" name="data" value="Data..."><br> <br>
+<button onclick= "sendPost()"> send </button>
 <br>
 <br>
 
 <textarea id="post-response"> waiting... </textarea>
 
+<p> Add a comment! </p>
+
+<input id="commentId" type="text" name="commentId" value="ID"><br>
+<input id="commentPostId" type="text" name="commentPostId" value="Which Post?"><br>
+<input id="commentText" type="text" name="data" value="Comment..."><br> <br>
+<button onclick= "sendComment()"> send </button>
+<br>
+<br>
+
+<textarea id="comment-response"> waiting... </textarea>
+
 <br><br><br><br><br>
 
 <p> Posts </p>
-<button onclick= "loadMessages()"> read </button>
+<button onclick= "readPosts()"> read posts </button>
 <br>
 <br>
 
 <p id='posts'></p>
+
+<br><br><br><br><br>
+
+<p> Post Comments </p>
+<input id="getCommentsPostId" type="text" name="getCommentsPostId" value="Which Post?"><br>
+<button onclick= "readComments()"> read comments </button>
+<br>
+<br>
+
+<p id='comments'></p>
 
 </body>
 

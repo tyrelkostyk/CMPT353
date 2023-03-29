@@ -58,7 +58,7 @@ app.get('/', (req, res) => {
 });
 
 
-// Add a new post to the posts DB
+// POST method that adds a new post to the posts DB
 app.post('/addPost', async (req, res) => {
     const { postId, postTopic, postData } = req.body;
 	const post = {
@@ -73,21 +73,20 @@ app.post('/addPost', async (req, res) => {
 
 	try {
 		const result = await postsDb.insert(post);
-		console.log('Inserted ' + postId + '@' + postTopic + ':' + postData);
-		// res.json(result);
+		console.log('Inserted Post');
 		res.json({ answer: 'wrote successfully!' });
 	} catch (error) {
 		console.error('Failed to insert post: ', error);
-		res.status(500).json({ asnwer: 'Error inserting post into the database.'});
+		res.status(500).json({ asnwer: 'Inserting post failed.'});
 	}
 });
 
 
-// GET method that returns all the posts
+// GET method that returns all the posts in the posts DB
 app.get('/getPosts', async (req, res) => {
 	try {
 		const result = await postsDb.list({ include_docs: true });
-		console.log('Sending posts: ', result);
+		console.log('Sending posts: ', result.rows);
 		// simplify the data and then send it
 		res.json(result.rows.map((row) => {
 			const { _id, topic, data } = row.doc;
@@ -95,9 +94,60 @@ app.get('/getPosts', async (req, res) => {
 		}));
 	} catch (error) {
 		console.log("getPosts failed: ", error);
-		res.status(500).json({ asnwer: 'Error getting all posts.'});
+		res.status(500).json({ asnwer: 'Getting all posts failed.'});
 	}
 });
+
+
+// POST method that adds a new comment to the comments DB, for a specific post
+app.post('/addComment/:postId', async (req, res) => {
+	const postId = req.params.postId;
+	const {commentId, commentText } = req.body;
+	const comment = {
+		_id: commentId,
+		post: postId,
+		text: commentText
+	};
+
+	console.log('Comment Received! ID: ' + commentId +
+							   ' Post: ' + postId +
+							   ' Text: ' + commentText);
+
+	try {
+		const result = await commentsDb.insert(comment);
+		console.log('Inserted Comment');
+		res.json({ answer: 'wrote successfully!' });
+	} catch (error) {
+		console.error('Failed to insert comment: ', error);
+		res.status(500).json({ asnwer: 'Inserting comment failed.'});
+	}
+});
+
+
+// GET method that returns all the comments (for a specific post) in the comment DB
+app.get('/getComments/:postId', async (req, res) => {
+	const postId = req.params.postId;
+
+	const query = {
+		selector: {
+			post: { $eq: postId }
+		}
+	};
+
+	try {
+		const result = await commentsDb.find(query);
+		console.log('Sending comments for postId (' + postId + '): ', result.docs);
+		// simplify the data and then send it
+		res.json(result.docs.map((doc) => {
+			const { _id, post, text } = doc;
+			return { commentId: _id, commentText: text };
+		}));
+	} catch (error) {
+		console.log("getComments failed: ", error);
+		res.status(500).json({ asnwer: 'Getting all comments failed.'});
+	}
+});
+
 
 // make the app listen
 app.listen(port, host, () => {
