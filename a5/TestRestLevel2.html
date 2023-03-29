@@ -46,7 +46,7 @@ function loadMessages()
 			// create header
 			var tableRow = table.insertRow(-1);
 			var indexHeader = document.createElement("th");
-			indexHeader.innerHTML = "Index";
+			indexHeader.innerHTML = "ID";
 			tableRow.appendChild(indexHeader)
 			var topicHeader = document.createElement("th");
 			topicHeader.innerHTML = "Topic";
@@ -55,7 +55,7 @@ function loadMessages()
 			dataHeader.innerHTML = "Data";
 			tableRow.appendChild(dataHeader)
 
-			var headers = ["id", "topic", "data"];
+			var headers = ["postId", "postTopic", "postData"];
 
 			// add JSON post data to table
 			for (var row = 0; row < data.length; row++) {

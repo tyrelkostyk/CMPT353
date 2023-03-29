@@ -83,21 +83,21 @@ app.post('/addPost', async (req, res) => {
 });
 
 
-// // GET method that returns all the posted DB entries
-// app.get('/api/getPosts', (req, res) => {
-// 	// select from table
-// 	const selectQuery = `SELECT * FROM ${tableName}`;
-// 	connection.query(selectQuery, (err, result) => {
-// 		if (err) {
-// 			console.log("getPosts failed: ", err);
-// 			res.status(500).send("Error querying the database.");
-// 		} else {
-// 			const response = JSON.parse(JSON.stringify(result));
-// 			console.log("Retrieved: ", response);
-// 			res.json(response);
-// 		}
-// 	});
-// });
+// GET method that returns all the posts
+app.get('/getPosts', async (req, res) => {
+	try {
+		const result = await postsDb.list({ include_docs: true });
+		console.log('Sending posts: ', result);
+		// simplify the data and then send it
+		res.json(result.rows.map((row) => {
+			const { _id, topic, data } = row.doc;
+			return { postId: _id, postTopic: topic, postData: data };
+		}));
+	} catch (error) {
+		console.log("getPosts failed: ", error);
+		res.status(500).json({ asnwer: 'Error getting all posts.'});
+	}
+});
 
 // make the app listen
 app.listen(port, host, () => {
