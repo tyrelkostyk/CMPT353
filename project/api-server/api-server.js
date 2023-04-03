@@ -27,14 +27,14 @@ const messageTableName = "messages";
 const replyTableName = "replies";
 const accountTableName = "accounts";
 
-// connect to the MySql server
+// Connect to the MySql server
 const connection = mySql.createConnection({
 	host: process.env.DB_HOST,
-	user: "root",
-	password: "password",
+	user: process.env.DB_USER,
+	password: process.env.DB_PASSWORD,
 });
 
-// make an asynchronous query to the MySql database
+// Make an asynchronous query to the MySql database
 function asyncQuery(query, params = []) {
 	return new Promise((resolve, reject) => {
 		connection.query(query, params, (err, result) => {
@@ -49,14 +49,7 @@ function asyncQuery(query, params = []) {
 *******************************************************************************/
 
 // Initialize the DB and tables
-let serverInitialized = false;
 async function initDb() {
-
-	// prevent multiple connection attempts
-	if (serverInitialized) {
-		console.log("Server DB already initialized.");
-		return;
-	}
 
 	// connect to mysql
 	connection.connect((err) => {
@@ -132,8 +125,6 @@ async function initDb() {
 
 		await asyncQuery(createReplyTableQuery);
 		console.log("Created replies table");
-
-		serverInitialized = true;
 
 	} catch (err) {
 		console.error("Failed to create tables: ", err);
@@ -244,6 +235,7 @@ app.get('/api/getMessages/:channelId', async (req, res) => {
 		res.status(500).send("Error querying the database for messages.");
 	}
 });
+
 
 /*******************************************************************************
 									REPLIES
