@@ -2,11 +2,62 @@
 
 <html>
 
-<title>CMPT353 - A5 - Level 2</title>
+<title>CMPT353 - A5 - Level 3</title>
 
 <body>
 
 <script type = "text/javascript">
+
+
+/**
+ * Create a button that gets & displays Post data at a given URL
+ */
+function createReadPostsButton(name, url) {
+	var button = document.createElement("button");
+	button.textContent = name;
+	button.addEventListener("click", function() {
+		readPosts(url);
+	});
+	return button;
+}
+
+
+/**
+ * Display Post data (ID, Topic, Data) in a new table
+ */
+function displayPosts(data) {
+	// create new table
+	const table = document.createElement("table");
+
+	// create header
+	var tableRow = table.insertRow(-1);
+	var indexHeader = document.createElement("th");
+	indexHeader.innerHTML = "ID";
+	tableRow.appendChild(indexHeader)
+	var topicHeader = document.createElement("th");
+	topicHeader.innerHTML = "Topic";
+	tableRow.appendChild(topicHeader)
+	var dataHeader = document.createElement("th");
+	dataHeader.innerHTML = "Data";
+	tableRow.appendChild(dataHeader)
+
+	var headers = ["postId", "postTopic", "postData"];
+
+	// add JSON post data to table
+	for (var row = 0; row < data.length; row++) {
+		tableRow = table.insertRow(-1);
+		for (var column = 0; column < headers.length; column++) {
+			var tableCell = tableRow.insertCell(-1);
+			tableCell.innerHTML = data[row][headers[column]];
+			console.log(data[row][headers[column]]);
+		}
+	}
+
+	// now add the new table to the container
+	document.getElementById("posts").innerHTML = "";
+	document.getElementById("posts").appendChild(table);
+}
+
 
 /**
  * Send a new post (containing ID, Topic & Data) to the server.
@@ -25,9 +76,16 @@ function sendPost()
 		.then(response => response.json())
 		.then(data => {
 			console.log(data);
-            document.getElementById("post-response").value = data.answer;
-	})
+			// set the text response
+            document.getElementById("post-response-message").value = data.answer;
+			// set the link response
+			document.getElementById("post-response-button").innerHTML = "";
+			document.getElementById("post-response-button").appendChild(
+				createReadPostsButton(data.link.rel, data.link.href)
+			);
+	});
 };
+
 
 /**
  * Send a comment (containing ID, Post ID, and Text) to the server.
@@ -41,56 +99,27 @@ function sendComment()
 	fetch(url, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ 'commentId': id, 'postId': postId, 'commentText': text })
+		body: JSON.stringify({ 'commentId': id, 'commentText': text })
 	})
 		.then(response => response.json())
 		.then(data => {
 			console.log(data);
             document.getElementById("comment-response").value = data.answer;
+			// TODO: access the link to GET all comments for this post
 	})
 };
 
 /**
  * Retrieve Posts (ID, Topic & Data) from the server
  */
-function readPosts()
+function readPosts(url)
 {
-	var url = '/getPosts';
 	fetch(url, {
 		method: 'GET',
 	})
 		.then(response => response.json())
 		.then(data => {
-			// create new table
-			const table = document.createElement("table");
-
-			// create header
-			var tableRow = table.insertRow(-1);
-			var indexHeader = document.createElement("th");
-			indexHeader.innerHTML = "ID";
-			tableRow.appendChild(indexHeader)
-			var topicHeader = document.createElement("th");
-			topicHeader.innerHTML = "Topic";
-			tableRow.appendChild(topicHeader)
-			var dataHeader = document.createElement("th");
-			dataHeader.innerHTML = "Data";
-			tableRow.appendChild(dataHeader)
-
-			var headers = ["postId", "postTopic", "postData"];
-
-			// add JSON post data to table
-			for (var row = 0; row < data.length; row++) {
-				tableRow = table.insertRow(-1);
-				for (var column = 0; column < headers.length; column++) {
-					var tableCell = tableRow.insertCell(-1);
-					tableCell.innerHTML = data[row][headers[column]];
-					console.log(data[row][headers[column]]);
-				}
-			}
-
-			// now add the new table to the container
-			document.getElementById("posts").innerHTML = "";
-			document.getElementById("posts").appendChild(table);
+			displayPosts(data);
 	})
 };
 
@@ -138,23 +167,27 @@ function readComments()
 			document.getElementById("comments").innerHTML = "";
 			document.getElementById("comments").appendChild(post);
 			document.getElementById("comments").appendChild(table);
+
+			// TODO: access the link to post a new comment for this post
 	})
 };
 
 </script>
 
-<p> Post Away! </p>
+<h3> Post Away! </h3>
 
 <input id="postId" type="text" name="postId" value="ID"><br>
 <input id="topic" type="text" name="topic" value="Topic..."><br>
 <input id="data" type="text" name="data" value="Data..."><br> <br>
 <button onclick= "sendPost()"> send </button>
 <br>
-<br>
 
-<textarea id="post-response"> waiting... </textarea>
+<div id="post-response">
+	<p id='post-response-button'></p>
+	<p id='post-response-message'> waiting... </p>
+</div>
 
-<p> Add a comment! </p>
+<h3> Add a comment! </h3>
 
 <input id="commentId" type="text" name="commentId" value="ID"><br>
 <input id="commentPostId" type="text" name="commentPostId" value="Which Post?"><br>
@@ -167,9 +200,7 @@ function readComments()
 
 <br><br><br><br><br>
 
-<p> Read Posts </p>
-<button onclick= "readPosts()"> read posts </button>
-<br>
+<h3> Read Posts </h3>
 <br>
 
 <p id='posts'></p>
@@ -177,7 +208,8 @@ function readComments()
 <br>
 <br>
 
-<p> Read Comments </p>
+<h3> Read Comments </h3>
+
 <input id="getCommentsPostId" type="text" name="getCommentsPostId" value="Which Post?"><br>
 <button onclick= "readComments()"> read comments </button>
 

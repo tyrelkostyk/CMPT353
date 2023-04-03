@@ -1,6 +1,6 @@
 // Tyrel Kostyk
 // tck290, 11216033
-// CMPT353 - Assignment 5 - Part A (Level 2 REST API)
+// CMPT353 - Assignment 5 - Part B (Level 3 REST API)
 // March 28 2023
 
 const express = require('express');
@@ -54,7 +54,7 @@ initDb();
 
 // main page entry point
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/TestRestLevel2.html')
+  res.sendFile(__dirname + '/TestRestLevel3.html')
 });
 
 
@@ -74,7 +74,14 @@ app.post('/addPost', async (req, res) => {
 	try {
 		const result = await postsDb.insert(post);
 		console.log('Inserted Post');
-		res.json({ answer: 'wrote successfully!' });
+		res.json({
+			answer: 'wrote successfully!',
+			link: {
+				rel: 'read posts',
+				href: '/getPosts',
+				method: 'GET'
+			}
+		});
 	} catch (error) {
 		console.error('Failed to insert post: ', error);
 		res.status(500).json({ answer: 'Inserting post failed.'});
@@ -90,6 +97,7 @@ app.get('/getPosts', async (req, res) => {
 		// simplify the data and then send it
 		res.json(result.rows.map((row) => {
 			const { _id, topic, data } = row.doc;
+			// TODO: include a link to GET the comments for each post (1 link/row)
 			return { postId: _id, postTopic: topic, postData: data };
 		}));
 	} catch (error) {
@@ -116,6 +124,7 @@ app.post('/addComment/:postId', async (req, res) => {
 	try {
 		const result = await commentsDb.insert(comment);
 		console.log('Inserted Comment');
+		// TODO: include a link to GET all of the comments for this post (1 link/msg)
 		res.json({ answer: 'wrote successfully!' });
 	} catch (error) {
 		console.error('Failed to insert comment: ', error);
@@ -140,6 +149,7 @@ app.get('/getComments/:postId', async (req, res) => {
 		// simplify the data and then send it
 		res.json(result.docs.map((doc) => {
 			const { _id, post, text } = doc;
+			// TODO: include a POST link to add a comment for this post (1 link/msg)
 			return { commentId: _id, commentText: text };
 		}));
 	} catch (error) {
