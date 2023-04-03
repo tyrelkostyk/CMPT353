@@ -99,16 +99,20 @@ async function initDb() {
 	// query to create message table
 	const createMessageTableQuery = `CREATE TABLE IF NOT EXISTS ${messageTableName} (
 		MessageId	INT UNSIGNED NOT NULL auto_increment,
+		Author		VARCHAR(100) NOT NULL,
 		ChannelId	VARCHAR(100) NOT NULL,
 		MessageText	VARCHAR(100) NOT NULL,
+		Score		INT UNSIGNED NOT NULL,
 		PRIMARY KEY (MessageId)
 	)`;
 
 	// query to create reply table
 	const createReplyTableQuery = `CREATE TABLE IF NOT EXISTS ${replyTableName} (
 		ReplyId		INT UNSIGNED NOT NULL auto_increment,
+		Author		VARCHAR(100) NOT NULL,
 		MessageId	VARCHAR(100) NOT NULL,
 		ReplyText	VARCHAR(100) NOT NULL,
+		Score		INT UNSIGNED NOT NULL,
 		PRIMARY KEY (ReplyId)
 	)`;
 
@@ -196,12 +200,14 @@ app.get('/api/getChannels', async (req, res) => {
 app.post('/api/addMessage/:channelId', async (req, res) => {
 	const channelId = req.params.channelId;
     const { text } = req.body;
+	// TODO: grab username from request
+	const author = "steve";
 
-	console.log('POST (add message) -> ChannelId: ' + channelId + ' Text: ' + text);
+	console.log('POST (add message) -> ChannelId: ' + channelId + ' Text: ' + text + ' Author: ' + author);
 
 	// insert new message into message table
-	const insertQuery = `INSERT INTO ${messageTableName} (ChannelId, MessageText)
-						VALUES ('${channelId}', '${text}') `;
+	const insertQuery = `INSERT INTO ${messageTableName} (Author, ChannelId, MessageText, Score)
+						VALUES ('${author}', '${channelId}', '${text}', '${0}') `;
 
 	try {
 		await asyncQuery(insertQuery);
@@ -245,12 +251,14 @@ app.get('/api/getMessages/:channelId', async (req, res) => {
 app.post('/api/addReply/:messageId', async (req, res) => {
 	const messageId = req.params.messageId;
     const { text } = req.body;
+	// TODO: grab username from request
+	const author = "jeff";
 
-	console.log('POST (add reply) -> MessageId: ' + messageId + ' Text: ' + text);
+	console.log('POST (add reply) -> MessageId: ' + messageId + ' Text: ' + text + ' Author: ' + author);
 
 	// insert new reply into reply table
-	const insertQuery = `INSERT INTO ${replyTableName} (MessageId, ReplyText)
-						VALUES ('${messageId}', '${text}') `;
+	const insertQuery = `INSERT INTO ${replyTableName} (Author, MessageId, ReplyText, Score)
+						VALUES ('${author}', '${messageId}', '${text}', '${0}') `;
 
 	try {
 		await asyncQuery(insertQuery);
@@ -285,6 +293,52 @@ app.get('/api/getReplies/:messageId', async (req, res) => {
 	}
 });
 
+
+/*******************************************************************************
+									VOTING
+*******************************************************************************/
+
+app.put('/api/voteMessage/:messageId/:vote', async (req, res) => {
+	const { messageId, vote } = req.params;
+
+	// TODO: add checks before implementing votes
+
+	let voteValue = 0;
+	if (vote == "up") {
+ 		voteValue = 1;
+	} else if (vote == "down") {
+		voteValue = -1;
+	} else {
+		console.log("voteMessage failed (invalid param): " + vote);
+		res.status(500).send("Invalid vote given.");
+	}
+
+	console.log('PUT (add vote) -> MessageId: ' + messageId + ' vote: ' + vote);
+
+	// update item in table
+	const updateQuery = `UPDATE ${replyTableName} SET Score = Score + ${voteValue} WHERE MessageId = ${messageId}`;
+
+	try {
+		await asyncQuery(updateQuery);
+		console.log("Voted on message: " + messageId);
+		res.json({ answer: "Voted on message successfully!" });
+
+	} catch (err) {
+		console.log("voteMessage failed: ", err);
+		res.status(500).send("Error updating the message score in the database.");
+	}
+});
+
+
+/*******************************************************************************
+									SEARCH
+*******************************************************************************/
+
+// ...
+
+/*******************************************************************************
+									LISTEN
+*******************************************************************************/
 
 // make the app listen
 app.listen(port, host, () => {
