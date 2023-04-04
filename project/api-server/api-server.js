@@ -4,7 +4,7 @@
 // April 6 2023
 
 /*******************************************************************************
-						  	DECLARATIONS & INCLUDES
+						  	DEFINITIONS & INCLUDES
 *******************************************************************************/
 
 const express = require('express');
@@ -12,7 +12,7 @@ const bodyParser = require('body-parser');
 const mySql = require('mysql');
 const cors = require('cors');
 
-const port = 3000;
+const port = process.env.API_SERVER_PORT || 3001;
 const host = '0.0.0.0';
 // const host = 'localhost';
 
@@ -136,7 +136,9 @@ async function initDb() {
 	}
 }
 
-initDb();
+// connect to the DB after waiting 5s
+const initDelay = 5000;
+setTimeout(() => { initDb(); }, initDelay);
 
 
 /*******************************************************************************

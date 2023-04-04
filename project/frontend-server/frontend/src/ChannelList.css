@@ -1,0 +1,27 @@
+.channel-list-container {
+  padding: 16px;
+  border-right: 3px solid #ccc;
+  width: 200px;
+}
+
+.refresh-button-container {
+  margin-bottom: 16px;
+}
+
+.channel-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.channel-list li {
+  margin-bottom: 8px;
+}
+
+.add-channel-button-container {
+  margin-top: 16px;
+}
+.add-channel-container {
+  margin-top: 16px;
+}

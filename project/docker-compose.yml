@@ -7,15 +7,18 @@ services:
       DB_PORT: 3306
       DB_USER: root
       DB_PASSWORD: password
+      API_SERVER_PORT: 3001
     ports:
-      - "3000:3000"
+      - "3001:3001"
     depends_on:
       - mysql
 
   frontend-server:
     build: ./frontend-server
+    environment:
+      FRONTEND_SERVER_PORT: 3000
     ports:
-      - "3001:3001"
+      - "3000:3000"
     depends_on:
       - api-server
 
