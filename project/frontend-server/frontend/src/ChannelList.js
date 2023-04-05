@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 import './ChannelList.css';
 
-const API_BASE_URL = 'http://api-server:3001';
+const API_BASE_URL = 'http://localhost:3001';
 
 
 function ChannelList() {
@@ -46,6 +46,9 @@ function ChannelList() {
 
 	return (
 	<div className="channel-list-container">
+		<div className="home-button">
+			<Link to="/"> <button> Go to Homepage </button> </Link>
+		</div>
 		<h2>Channels</h2>
 		<div className="refreh-button-container">
 			<button onClick={fetchChannels}> Refresh List </button>
@@ -53,7 +56,7 @@ function ChannelList() {
 		<ul className="channel-list">
 			{channels.map((channel) => (
 				<li key={channel.id}>
-					<Link to={`/getMessages/${channel.id}`}>{channel.name}</Link>
+					<Link to={`/channelView/${channel.id}`}>{channel.name}</Link>
 				</li>
 			))}
 		</ul>

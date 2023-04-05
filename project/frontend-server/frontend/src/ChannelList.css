@@ -4,6 +4,10 @@
   width: 200px;
 }
 
+.home-button {
+  margin-bottom: 16px;
+}
+
 .refresh-button-container {
   margin-bottom: 16px;
 }

@@ -8,4 +8,4 @@ COPY . .
 
 CMD ["node", "frontend-server.js"]
 
-EXPOSE 3001
+EXPOSE 3000

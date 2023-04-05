@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
-const API_BASE_URL = 'http://api-server:3001';
+const API_BASE_URL = 'http://localhost:3001';
 
 
 function ChannelView(props) {
-	const [messages, 	setMessages] 	= useState([]);
-	const { channelId } = props.match.params;
+	const [messages, setMessages] = useState([]);
+	const { channelId } = useParams();
 
 	// get all messages from the database
 	async function fetchMessages() {

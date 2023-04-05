@@ -22,10 +22,11 @@ app.use(bodyParser.json());
 app.use(cors());
 
 const databaseName = "db";
+const accountTableName = "accounts";
 const channelTableName = "channels";
 const messageTableName = "messages";
+const voteTableName = "votes";
 const replyTableName = "replies";
-const accountTableName = "accounts";
 
 // Connect to the MySql server
 const connection = mySql.createConnection({
@@ -82,38 +83,47 @@ async function initDb() {
 
 	// query to create channel table
 	const createAccountTableQuery = `CREATE TABLE IF NOT EXISTS ${accountTableName} (
-		Username	VARCHAR(100) NOT NULL,
-		Password	VARCHAR(100) NOT NULL,
-		DisplayName	VARCHAR(100) NOT NULL,
-		PRIMARY KEY (Username)
+		username	VARCHAR(100) NOT NULL,
+		password	VARCHAR(100) NOT NULL,
+		displayName	VARCHAR(100) NOT NULL,
+		PRIMARY KEY (username)
 	)`;
 
 	// query to create channel table
 	const createChannelTableQuery = `CREATE TABLE IF NOT EXISTS ${channelTableName} (
-		ChannelId			INT UNSIGNED NOT NULL auto_increment,
-		ChannelName			VARCHAR(100) NOT NULL,
-		ChannelDescription	VARCHAR(100) NOT NULL,
-		PRIMARY KEY (ChannelId)
+		id			INT UNSIGNED NOT NULL auto_increment,
+		name		VARCHAR(100) NOT NULL,
+		description	VARCHAR(100) NOT NULL,
+		PRIMARY KEY (id)
 	)`;
 
 	// query to create message table
 	const createMessageTableQuery = `CREATE TABLE IF NOT EXISTS ${messageTableName} (
-		MessageId	INT UNSIGNED NOT NULL auto_increment,
-		Author		VARCHAR(100) NOT NULL,
-		ChannelId	VARCHAR(100) NOT NULL,
-		MessageText	VARCHAR(100) NOT NULL,
-		Score		INT UNSIGNED NOT NULL,
-		PRIMARY KEY (MessageId)
+		id			INT UNSIGNED NOT NULL auto_increment,
+		author		VARCHAR(100) NOT NULL,
+		channelId	VARCHAR(100) NOT NULL,
+		text		VARCHAR(100) NOT NULL,
+		score		INT UNSIGNED NOT NULL,
+		PRIMARY KEY (id)
+	)`;
+
+	// query to create votes table
+	const createVotesTableQuery = `CREATE TABLE IF NOT EXISTS ${voteTableName} (
+		id			INT UNSIGNED NOT NULL auto_increment,
+		username	VARCHAR(100) NOT NULL,
+		messageId	VARCHAR(100) NOT NULL,
+		vote		VARCHAR(100) NOT NULL,
+		PRIMARY KEY (id),
+		UNIQUE KEY (username, messageId)
 	)`;
 
 	// query to create reply table
 	const createReplyTableQuery = `CREATE TABLE IF NOT EXISTS ${replyTableName} (
-		ReplyId		INT UNSIGNED NOT NULL auto_increment,
-		Author		VARCHAR(100) NOT NULL,
-		MessageId	VARCHAR(100) NOT NULL,
-		ReplyText	VARCHAR(100) NOT NULL,
-		Score		INT UNSIGNED NOT NULL,
-		PRIMARY KEY (ReplyId)
+		id			INT UNSIGNED NOT NULL auto_increment,
+		author		VARCHAR(100) NOT NULL,
+		messageId	VARCHAR(100) NOT NULL,
+		text		VARCHAR(100) NOT NULL,
+		PRIMARY KEY (id)
 	)`;
 
 	// create the tables
@@ -127,6 +137,9 @@ async function initDb() {
 		await asyncQuery(createMessageTableQuery);
 		console.log("Created messages table");
 
+		await asyncQuery(createVotesTableQuery);
+		console.log("Created votes table");
+
 		await asyncQuery(createReplyTableQuery);
 		console.log("Created replies table");
 
@@ -137,7 +150,7 @@ async function initDb() {
 }
 
 // connect to the DB after waiting 5s
-const initDelay = 5000;
+const initDelay = 10000;
 setTimeout(() => { initDb(); }, initDelay);
 
 
@@ -145,7 +158,26 @@ setTimeout(() => { initDb(); }, initDelay);
 									ACCOUNTS
 *******************************************************************************/
 
-// ...
+// Create a new channel
+app.post('/api/register', async (req, res) => {
+	const { username, password, displayName } = req.body;
+
+	console.log('POST (register) -> Diplay name: ' + displayName + ' Username: ' + username);
+
+	// insert new account into accounts table
+	const insertQuery = `INSERT INTO ${accountTableName} (username, password, displayName)
+						VALUES ('${username}', '${password}, '${displayName}') `;
+
+	try {
+		await asyncQuery(insertQuery);
+		console.log("Registered account: " + username + ":" + displayName);
+		res.json({ answer: "Registered account successfully!" });
+
+	} catch (err) {
+		console.error("Failed to register account: ", err);
+		res.status(500).send("Error registering new user into the database.");
+	}
+});
 
 /*******************************************************************************
 									CHANNELS
@@ -158,7 +190,7 @@ app.post('/api/addChannel', async (req, res) => {
 	console.log('POST (create channel) -> Name: ' + name + ' Description: ' + description);
 
 	// insert new channel into channel table
-	const insertQuery = `INSERT INTO ${channelTableName} (ChannelName, ChannelDescription)
+	const insertQuery = `INSERT INTO ${channelTableName} (name, description)
 						VALUES ('${name}', '${description}') `;
 
 	try {
@@ -205,15 +237,15 @@ app.post('/api/addMessage/:channelId', async (req, res) => {
 	// TODO: grab username from request
 	const author = "steve";
 
-	console.log('POST (add message) -> ChannelId: ' + channelId + ' Text: ' + text + ' Author: ' + author);
+	console.log('POST (add message) -> channelId: ' + channelId + ' Text: ' + text + ' author: ' + author);
 
 	// insert new message into message table
-	const insertQuery = `INSERT INTO ${messageTableName} (Author, ChannelId, MessageText, Score)
+	const insertQuery = `INSERT INTO ${messageTableName} (author, channelId, text, score)
 						VALUES ('${author}', '${channelId}', '${text}', '${0}') `;
 
 	try {
 		await asyncQuery(insertQuery);
-		console.log("Added message " + channelId + ":" + text);
+		console.log("User " + author + " added message " + channelId + ":" + text);
 		res.json({ answer: "Added message successfully!" });
 
 	} catch (err) {
@@ -227,15 +259,15 @@ app.post('/api/addMessage/:channelId', async (req, res) => {
 app.get('/api/getMessages/:channelId', async (req, res) => {
 	const channelId = req.params.channelId;
 
-	console.log('GET (all messages) -> ChannelId: ' + channelId);
+	console.log('GET (all messages) -> channelId: ' + channelId);
 
 	// select from table
-	const selectQuery = `SELECT * FROM ${messageTableName} WHERE ChannelId = ${channelId}`;
+	const selectQuery = `SELECT * FROM ${messageTableName} WHERE channelId = ${channelId}`;
 
 	try {
 		result = await asyncQuery(selectQuery);
 		const response = JSON.parse(JSON.stringify(result));
-		console.log("Retrieved Messages: ", response);
+		console.log("Retrieved Messages from (" + channelId + "): ", response);
 		res.json(response);
 
 	} catch (err) {
@@ -256,15 +288,15 @@ app.post('/api/addReply/:messageId', async (req, res) => {
 	// TODO: grab username from request
 	const author = "jeff";
 
-	console.log('POST (add reply) -> MessageId: ' + messageId + ' Text: ' + text + ' Author: ' + author);
+	console.log('POST (add reply) -> messageId: ' + messageId + ' Text: ' + text + ' author: ' + author);
 
 	// insert new reply into reply table
-	const insertQuery = `INSERT INTO ${replyTableName} (Author, MessageId, ReplyText, Score)
+	const insertQuery = `INSERT INTO ${replyTableName} (author, messageId, text, score)
 						VALUES ('${author}', '${messageId}', '${text}', '${0}') `;
 
 	try {
 		await asyncQuery(insertQuery);
-		console.log("Added reply " + messageId + ":" + text);
+		console.log("User " + author + " added reply " + messageId + ":" + text);
 		res.json({ answer: "Added reply successfully!" });
 
 	} catch (err) {
@@ -278,15 +310,15 @@ app.post('/api/addReply/:messageId', async (req, res) => {
 app.get('/api/getReplies/:messageId', async (req, res) => {
 	const messageId = req.params.messageId;
 
-	console.log('GET (all replies) -> MessageId: ' + messageId);
+	console.log('GET (all replies) -> messageId: ' + messageId);
 
 	// select from table
-	const selectQuery = `SELECT * FROM ${replyTableName} WHERE MessageId = ${messageId}`;
+	const selectQuery = `SELECT * FROM ${replyTableName} WHERE messageId = ${messageId}`;
 
 	try {
 		result = await asyncQuery(selectQuery);
 		const response = JSON.parse(JSON.stringify(result));
-		console.log("Retrieved Replies: ", response);
+		console.log("Retrieved Replies from (" + messageId + "): ", response);
 		res.json(response);
 
 	} catch (err) {
@@ -315,13 +347,29 @@ app.put('/api/voteMessage/:messageId/:vote', async (req, res) => {
 		res.status(500).send("Invalid vote given.");
 	}
 
-	console.log('PUT (add vote) -> MessageId: ' + messageId + ' vote: ' + vote);
+	console.log('PUT (add vote) -> messageId: ' + messageId + ' vote: ' + vote);
 
-	// update item in table
-	const updateQuery = `UPDATE ${replyTableName} SET Score = Score + ${voteValue} WHERE MessageId = ${messageId}`;
+	const username = "steve";	// TODO: use actual username
+	// insert/update vote in votes table
+	const updateVoteQuery = `INSERT INTO ${voteTableName} (username, messageId, vote)
+							 VALUES (${username, messageId, vote})
+							 ON DUPLICATE KEY UPDATE vote = ${vote}`;
 
 	try {
-		await asyncQuery(updateQuery);
+		await asyncQuery(updateVoteQuery);
+		console.log("Recorded vote(" + vote + ") on message: " + messageId);
+		// continue...
+
+	} catch (err) {
+		console.log("voteMessage failed: ", err);
+		res.status(500).send("Error recording the vote in the database.");
+	}
+
+	// update message score in messages table
+	const updateScoreQuery = `UPDATE ${messageTableName} SET score = score + ${voteValue} WHERE id = ${messageId}`;
+
+	try {
+		await asyncQuery(updateScoreQuery);
 		console.log("Voted on message: " + messageId);
 		res.json({ answer: "Voted on message successfully!" });
 
