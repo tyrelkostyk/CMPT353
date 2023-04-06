@@ -14,8 +14,12 @@ function ChannelList() {
 	// get all channels from the database
 	async function fetchChannels() {
 		try {
-			var url = `${API_BASE_URL}/api/getChannels`;
-			const response = await fetch(url, { method: 'GET' });
+			const url = `${API_BASE_URL}/api/getChannels`;
+			const token = localStorage.getItem('token');
+			const response = await fetch(url, {
+				method: 'GET',
+				headers: { 'Authorization': `Bearer ${token}` }
+			});
 			const data = await response.json();
 			setChannels(data);
 			console.log(data);
@@ -27,10 +31,14 @@ function ChannelList() {
 	// add a new channel to the database
 	async function addChannel() {
 		try {
-			var url = `${API_BASE_URL}/api/addChannel`;
+			const url = `${API_BASE_URL}/api/addChannel`;
+			const token = localStorage.getItem('token');
 			const response = await fetch(url, {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				},
 				body: JSON.stringify({ 'name': name, 'description': description })
 			});
 			const data = await response.json();
@@ -46,8 +54,14 @@ function ChannelList() {
 
 	return (
 	<div className="channel-list-container">
+		<div className="auth-button">
+			<Link to="/"> <button> Sign In / Register </button> </Link>
+		</div>
 		<div className="home-button">
-			<Link to="/"> <button> Go to Homepage </button> </Link>
+			<Link to="/auth"> <button> Home </button> </Link>
+		</div>
+		<div className="search-button">
+			<Link to="/search"> <button> Search </button> </Link>
 		</div>
 		<h2>Channels</h2>
 		<div className="refreh-button-container">

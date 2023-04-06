@@ -15,7 +15,11 @@ function Search() {
 	async function searchChannels() {
 		try {
 			var url = `${API_BASE_URL}/api/searchChannels/${channelSearch}`;
-			const response = await fetch(url, { method: 'GET' });
+			const token = localStorage.getItem('token');
+			const response = await fetch(url, {
+				method: 'GET',
+				headers: { 'Authorization': `Bearer ${token}` }
+			});
 			const data = await response.json();
 			setChannelResults(data);
 			console.log("Searched Channels: ", data);
@@ -28,7 +32,11 @@ function Search() {
 	async function searchMessages() {
 		try {
 			var url = `${API_BASE_URL}/api/searchMessages/${messageSearch}`;
-			const response = await fetch(url, { method: 'GET' });
+			const token = localStorage.getItem('token');
+			const response = await fetch(url, {
+				method: 'GET',
+				headers: { 'Authorization': `Bearer ${token}` }
+			});
 			const data = await response.json();
 			setMessageResults(data);
 			console.log("Searched Messages: ", data);
@@ -54,7 +62,7 @@ function Search() {
 			<ul className="search-channels-results-list">
 				{channelResults.map((channel) => (
 					<li key={channel.id}>
-						<Link to={`/getMessages/${channel.id}`}>{channel.name}</Link>
+						<Link to={`/channelView/${channel.id}`}>{channel.name}</Link>
 					</li>
 				))}
 			</ul>
@@ -72,7 +80,7 @@ function Search() {
 			<ul className="search-messages-results-list">
 				{messageResults.map((message) => (
 					<li key={message.id}>
-						<Link to={`/getMessages/${message.channelId}`}>{message.author} : {message.text}</Link>
+						<Link to={`/channelView/${message.channelId}`}>{message.author} : {message.text}</Link>
 					</li>
 				))}
 			</ul>

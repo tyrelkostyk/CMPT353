@@ -23,6 +23,15 @@
   margin-bottom: 8px;
 }
 
+.channel-list li a {
+  color: red;
+  text-decoration: none;
+}
+
+.channel-list li a:hover {
+  color: darkred;
+}
+
 .add-channel-button-container {
   margin-top: 16px;
 }
