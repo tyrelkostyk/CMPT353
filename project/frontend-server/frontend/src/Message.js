@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+import './Message.css';
+
 const API_BASE_URL = 'http://localhost:3001';
 
 
@@ -45,34 +47,75 @@ function Message({message}) {
 		}
 	}
 
+	// update this message's score (add an upvote)
+	async function addUpvote() {
+		try {
+			const url = `${API_BASE_URL}/api/voteMessage/${message.id}/up`;
+			const token = localStorage.getItem('token');
+			const response = await fetch(url, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				}
+			});
+			const data = await response.json();
+			console.log("Added an upvote! ", data);
+			// TODO: update messages
+		} catch (err) {
+			console.error("Error adding a new reply: ", err);
+		}
+	}
+
+	// update this message's score (add a downvote)
+	async function addDownvote() {
+		try {
+			const url = `${API_BASE_URL}/api/voteMessage/${message.id}/down`;
+			const token = localStorage.getItem('token');
+			const response = await fetch(url, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				}
+			});
+			const data = await response.json();
+			console.log("Added a downvote! ", data);
+			// TODO: update messages
+		} catch (err) {
+			console.error("Error adding a new reply: ", err);
+		}
+	}
+
 	// fetch messages when element is mounted
 	useEffect(() => { fetchReplies(); }, []);
 
 	return (
 	<div>
 	<div className="message">
-		<h3>{message.author} : {message.text}</h3>
+		<h3>{message.author} [{message.score}]:</h3>
+		<h4>{message.text}</h4>
+		<div>
+			<button onClick={addUpvote}>Upvote</button>
+			<button onClick={addDownvote}>Downvote</button>
+		</div>
 	</div>
 	<div className="replies-container">
-		<h4>Replies</h4>
 		<ul>
 			{replies.map((reply) => (
 				<li key={reply.id}>
-					{reply.author} : {reply.text}
+					<h5>{reply.author}:  {reply.text}</h5>
 				</li>
 			))}
 		</ul>
 	</div>
 	<div className="add-reply-container">
-		<h4>Add a new reply</h4>
 		<input
 			type="text"
 			placeholder="Reply Text..."
 			value={text}
 			onChange={e => setText(e.target.value)} />
-		<div className="add-reply-button-container">
-			<button onClick={addReply}> Send Reply </button>
-		</div>
+		<button onClick={addReply}> Send Reply </button>
 	</div>
 	</div>
 	)

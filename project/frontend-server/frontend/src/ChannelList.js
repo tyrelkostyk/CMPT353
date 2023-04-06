@@ -55,17 +55,17 @@ function ChannelList() {
 	return (
 	<div className="channel-list-container">
 		<div className="auth-button">
-			<Link to="/"> <button> Sign In / Register </button> </Link>
+			<Link to="/auth"> <button> Sign In / Register </button> </Link>
 		</div>
 		<div className="home-button">
-			<Link to="/auth"> <button> Home </button> </Link>
+			<Link to="/"> <button> Home </button> </Link>
 		</div>
 		<div className="search-button">
 			<Link to="/search"> <button> Search </button> </Link>
 		</div>
 		<h2>Channels</h2>
 		<div className="refreh-button-container">
-			<button onClick={fetchChannels}> Refresh List </button>
+			<button onClick={fetchChannels}> Refresh </button>
 		</div>
 		<ul className="channel-list">
 			{channels.map((channel) => (

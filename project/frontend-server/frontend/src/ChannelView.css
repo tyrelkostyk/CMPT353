@@ -7,6 +7,7 @@
 .message-container {
   flex: 1;
   overflow-y: auto;
+  text-align: left;
 }
 
 .message-container ul {
@@ -14,12 +15,7 @@
   padding: 0;
 }
 
-.message-container li {
-  padding: 10px 0;
-  border-bottom: 1px solid #ccc;
-}
-
 .add-message-container {
-  border-top: 8px solid #9D0000;
+  border-top: 4px solid #9D0000;
   padding: 10px 0;
 }

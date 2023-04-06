@@ -74,9 +74,7 @@ function ChannelView(props) {
 			placeholder="Message Text..."
 			value={text}
 			onChange={e => setText(e.target.value)} />
-		<div className="add-message-button-container">
-			<button onClick={addMessage}> Send </button>
-		</div>
+		<button onClick={addMessage}> Send </button>
 	</div>
 	</div>
 	)

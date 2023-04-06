@@ -1,0 +1,15 @@
+.message {
+  padding: 10px 0;
+  border-top: 2px solid #ccc;
+}
+
+.replies-container {
+  padding: 3px 0;
+  border-top: 1px solid #ccc;
+}
+
+.add-reply-container {
+  padding: 5px 0;
+  border-top: 1px solid #9D0000;
+  text-align: centre;
+}
